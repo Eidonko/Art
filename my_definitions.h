@@ -1,0 +1,10 @@
+#define ALARM 999
+#define SPARE 3
+#define VOTER1  0
+#define VOTER2  1
+#define VOTER3  2
+#define NODE1  1
+#define NODE2  2
+#define NODE3  3
+#define NODE4  4
+#define HAS_FAILED 9999

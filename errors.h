@@ -1,0 +1,4 @@
+/*
+ phases of the voter
+ */
+
