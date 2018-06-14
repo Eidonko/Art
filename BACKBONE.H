@@ -1,30 +1,5 @@
 /*******************************************************************************
 **
-** Copyright (c)1999, 2000  K.U.Leuven/ESAT/ACCA, Leuven, 2000
-** All Rights Reserved.
-**
-********************************************************************************
-** Project      :    TIRAN
-** Task			:    TIRAN Backbone
-** Module       :    TIRAN backbome main module
-** File Name    :    BACKBONE.H
-**
-** Date Created :    Dec 1999
-** Created By   :    V De Florio <VDF>
-** Organization :    K.U.Leuven
-**
-** Version      :    1.0
-** Last Changed :	 14 Feb 2000
-** Author       :	 VDF
-** Organization :	 K.U.Leuven
-** Saved at     :	 
-**
-** Revisions    :
-** Rev ID Who   Date         What                            Approved/Date
-** --- -- ----- ------------ ------------------------------- -------------------
-**   1     AS   <dd/MMM/yyyy>                                <ini>/<dd/MMM/yyyy>
-**
-********************************************************************************
 ** Description :
 ** HEADER FOR THE TIME-OUTS, MAILBOXES, LOGICALS OF THE TIRAN BACKBONE
 **

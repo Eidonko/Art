@@ -8,10 +8,9 @@
  *
  *      Language: yacc
  *
- *      History:
- *      Version   1.1b 27-Aug-1997  Eidon@tutanota.com
+ *      By  Eidon@tutanota.com
  */
-#define VERSION "v1.1b 27-Aug-1997"
+#define VERSION "v1.2 2018-06-14"
 #define EFTOS_ENV "EFTOS_HOME"
 #define EFTOS_SRC ".eftosrc"
 #define EFTOS_OUT ".eftosrcode"
@@ -1127,7 +1126,7 @@ main(int argc, char *argv[])
     ifname = EFTOS_SRC;
     ofname = EFTOS_OUT;
 
-    fprintf(stderr, "RL translator, %s, (c) K.U.Leuven 1997.\n", VERSION);
+    fprintf(stderr, "RL translator, %s, by Eidon@tutanota.com.\n", VERSION);
     for (i=1; i<argc; i++)
          if (argv[i][0] == '-')
              switch (argv[i][1])

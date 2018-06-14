@@ -690,11 +690,8 @@ int ident_flush(FILE *h, char *rlfile)
 		if (taskram[i].identifier != -1)
 			break;
 
-printf("nprocs = %d\n", nprocs);
-
 	for (node=0; i<=nprocs; i++)
 	{
-printf("node = %d\n", node);
 		while (taskram[i].node > node)
 		{
 			fprintf(f, "\t{ ");
@@ -721,8 +718,10 @@ printf("node = %d\n", node);
 			fprintf(f, " -1,");
 
 
+/*
 		printf("\n\t\ttaskram[%d].node == %d, node == %d, t == %d, u == %d\n",
 			i, taskram[i].node, node, taskram[i].idf, taskram[i].identifier);
+ */
  
 
 		fprintf(f, "}, \n");

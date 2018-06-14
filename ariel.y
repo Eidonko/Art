@@ -17,13 +17,13 @@
 #define VERSION "v3.0e"
 #define EFTOS_ENV "TIRAN_HOME"
 #define EFTOS_SRC ".ariel"
-#define HFNAME    "../trl.h"
-#define TONAME    "../timeouts.h"
-#define IDNAME    "../identifiers.h"
-#define ALPHANAME "../alphacount.h"
-#define STRNAME   "../arielstrings.h"
-#define LOGICAL_FNAME "LogicalTable.csv"
-#define TASK_FNAME    "TaskTable.csv"
+#define HFNAME    "outputs/trl.h"
+#define TONAME    "outputs/timeouts.h"
+#define IDNAME    "outputs/identifiers.h"
+#define ALPHANAME "outputs/alphacount.h"
+#define STRNAME   "outputs/arielstrings.h"
+#define LOGICAL_FNAME "outputs/LogicalTable.csv"
+#define TASK_FNAME    "outputs/TaskTable.csv"
 
 #ifndef CLOCKS_PER_SEC
 #define CLOCKS_PER_SEC 1000000
@@ -48,6 +48,7 @@ char *ifname, *ofname;
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <ctype.h>
 #include <fcntl.h>
 #include <time.h>
@@ -1459,13 +1460,13 @@ int main(int argc, char *argv[])
     extern int       maxlogical;
     extern int       maxtask, maxtaskII;
 
-    printf("Content-type: text/plain\n\n"); fflush(stdout);
+    //printf("Content-type: text/plain\n\n"); fflush(stdout);
 
     ifname = EFTOS_SRC;
     ofname = RCODE_FILE; 
     verbose = 1, debug = notime = static_version = 0; /* set default values */
 
-    fprintf(stderr, "Ariel translator, %s, (c) K.U.Leuven 1998, 1999, 2000.\n", 
+    fprintf(stderr, "Ariel translator, %s, by Eidon@tutanota.com.\n", 
 	VERSION);
     for (i=1; i<argc; i++)
 	 if (argv[i][0] == '-')
@@ -1549,6 +1550,7 @@ dup2(1,2);
 
     fprintf(stderr, "Parsing file %s...\n", ifname);
 
+    mkdir("outputs", DEFFILEMODE);
     DeBug; /* 1 */
 
     t1 = clock();
@@ -1714,9 +1716,10 @@ dup2(1,2);
     DeBug; /* 16 */
 
     close(fd);
-    printf("Press any key to finish processing...\n");
+    //printf("Press any key to finish processing...\n");
     dup2(old_fd, 0);
-    while ( kbwait() == 0) ;
+    //while ( kbwait() == 0) ;
+	//kbwait();
 
 	return 0;
 }
