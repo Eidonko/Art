@@ -10,12 +10,7 @@
 /*                                                                            */
 /*     conceived, designed, and implemented by                                */
 /*     <a href=http://www.esat.kuleuven.ac.be/~deflorio>Eidon@tutanota.com</a>*/
-/*     Copyright (c) 1995, 2001, Eidon@tutanota.com. All rights reserved.     */
-/*                                                                            */
-/*     Modified in March 1996 by Cesare Antifora,                             */
-/*     to fix a bug in the decoding procedure.                                */
-/*                                                                            */
-/*      Rel. date: Feb 27, 2001.  Version 1.1                                 */
+/*     Copyright (c) Eidon@tutanota.com. All rights reserved.                 */
 /*                                                                            */
 /******************************************************************************/
 

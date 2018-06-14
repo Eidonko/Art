@@ -1762,7 +1762,6 @@ char *today()
  *
  *  return values: number of associations added to a.
  *
- *  Creation date: 28 Oct. 1997.
  */
 #define  SEPAR   "\t\n "
 int read_associations(ASSOC *a, char *fname)
@@ -1776,22 +1775,25 @@ int read_associations(ASSOC *a, char *fname)
   char *x, *y;
   char *strdup(const char *);
   
-      /*
-  printf("within read_associations\n");
-      */
-  if (!a || !f) return 0;
+  //printf("within read_associations\n");
+  if (!a) {
+    fprintf(stderr, "read_associations: ASSOC is null\n");
+    fflush(stderr);
+	return 0;
+  }
   f = fopen(fname, "r");
-  if (!f) return 0;
+  if (!f) {
+    fprintf(stderr, "read_associations: can't open file %s\n", fname);
+	return 0;
+  }
 
   while (fgets(string, 256, f) != NULL)
   {
       if (string[0]!='#') continue;
 
-      /*
-      printf("found a '#'-record in file\n");
-      printf("string == %s", string);
-      printf("string+1 == %s", string+1);
-      */
+      //printf("found a '#'-record in file\n");
+      //printf("string == %s", string);
+      //printf("string+1 == %s", string+1);
       tmp = strtok(string+1, SEPAR);
 
       /*
@@ -1822,7 +1824,9 @@ int read_associations(ASSOC *a, char *fname)
       if (i<l) continue;
 
       /*
+	*/
       printf("about to add association `%s' -> `%s'\n", domain, codomain);
+/*
       */
       if (domain && codomain)
       {

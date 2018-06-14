@@ -1,0 +1,7 @@
+#define VERSION1 10
+#define VERSION2 20
+#define VERSION3 30
+#define VERSION_TIMEOUT 20000
+#define NVP_LOGICAL 15
+#define NVP_OUTPUT 2
+#define NVP_ERROR  3

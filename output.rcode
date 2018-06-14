@@ -1,0 +1,21 @@
+Art translated Ariel strategy file: .... test3.ariel
+into rcode object file : ............... .rcode
+
+ line                rcode     opn1   opn2
+-----------------------------------------------
+00000                   IF 
+00001       STORE_PHASE...   Thread      0
+00002           ...COMPARE       ==      1
+00003                FALSE     10 
+00004                 KILL   Thread      0
+00005              PUSH...     18 
+00006              ...SEND   Thread      3
+00007              PUSH...      0 
+00008              ...SEND   Thread      3
+00009              PUSH...      3 
+00010              ...SEND   Thread      1
+00011              PUSH...      3 
+00012              ...SEND   Thread      2
+00013                   FI 
+00014      ANEW_OA_OBJECTS      1 
+00015                 STOP 

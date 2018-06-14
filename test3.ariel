@@ -1,0 +1,9 @@
+    INCLUDE "my_definitions.h"
+    IF [ PHASE (T{VOTER1}) == {HAS FAILED} ]
+    THEN
+        STOP T{VOTER1}
+        SEND {WAKEUP} T{SPARE}
+        SEND {VOTER1} T{SPARE}
+        SEND {SPARE} T{VOTER2}
+        SEND {SPARE} T{VOTER3}
+    FI
