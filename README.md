@@ -70,8 +70,93 @@ File test1.ariel can be translated by executing the following command:
     Parsing file test1.ariel...
     ...done (4 lines.)
     Output written in file .rcode.
-    Logicals written in file LogicalTable.csv.
-    Tasks written in file TaskTable.csv.
-    Alpha-count parameters written in file ../alphacount.h.
+    Logicals written in file outputs/LogicalTable.csv.
+    Tasks written in file outputs/TaskTable.csv.
+    Alpha-count parameters written in file outputs/alphacount.h.
 
-(to be continued...)
+Extra files are created by using the "-s" option.
+
+    $ art -s -i test1.ariel
+    Ariel translator, v3.0e, by Eidon@tutanota.com.
+    Parsing file test1.ariel...
+    ...done (4 lines.)
+    Output written in file .rcode.
+    Logicals written in file outputs/LogicalTable.csv.
+    Tasks written in file outputs/TaskTable.csv.
+    static version
+    Preloaded r-codes written in file outputs/trl.h.
+    Time-outs written in file outputs/timeouts.h.
+    Identifiers written in file outputs/identifiers.h.
+    Alpha-count parameters written in file outputs/alphacount.h.
+
+The “-s” option, for “static”, requests the writing of a number of header
+files. The produced header files contain definitions like the following one, from file “timeouts.h”:
+
+ARIEL can be used to configure statically the TIRAN tools. The current prototypic version can
+configure only one tool, the TIRAN watchdog. The following syntax is recognised by art to
+configure it:
+
+    WATCHDOG 10 WATCHES TASK 14
+        HEARTBEATS EVERY 100 MS
+        ON ERROR WARN TASK 18
+    END WATCHDOG.
+
+The output in this case is a C file that corresponds to a configured instance of a watchdog.
+
+ARIEL supports N-version programming [Avi85]. The following is an example that shows how it is
+possible to define an “N-version task” with ARIEL:
+
+    N-VERSION TASK 1
+        VERSION 1 IS TASK2
+        VERSION 2 IS TASK4
+        VERSION 3 IS TASK8
+        METRIC "nvp_comp"
+        ON SUCCESS TASK5
+        ON ERROR TASK12
+        VOTING ALGORITHM IS MAJORITY
+    END N-VERSION
+
+If we invoke art with as input the above excerpt (see file test2.ariel), a number of C codes are automatically created:
+
+    $ art -s -i test2.ariel
+    Ariel translator, v3.0e, by Eidon@tutanota.com.
+    ...
+    
+    $ ls -lt | head -5
+    total 1255
+    -rwxrwx---+ 1 DEFLORIV Domain Users    221 Jun 14 22:17 output.rcode
+    -rw-rw-r--+ 1 DEFLORIV Domain Users   1196 Jun 14 22:17 TIRAN_task_8.c
+    -rw-rw-r--+ 1 DEFLORIV Domain Users   1196 Jun 14 22:17 TIRAN_task_4.c
+    -rw-rw-r--+ 1 DEFLORIV Domain Users   1196 Jun 14 22:17 TIRAN_task_2.c
+
+    $ less TIRAN_task_8.c
+    #include "../TIRAN_API.h"
+    /* Task 8 of NVersion Task 1
+       Version 3 / 3
+     */
+
+    int TIRAN_task_8(void) {
+            TIRAN_Voting_t *dv;
+            size_t size;
+            double nvp_comp(const void*, const void*);
+
+            dv = TIRAN_VotingOpen(nvp_comp);
+            if (dv == NULL) {
+                    RaiseEvent(TIRAN_ERROR_VOTING_CANTOPEN);
+                    TIRAN_exit(TIRAN_ERROR_VOTING_CANTOPEN);
+            }
+
+            /* voting task description: which tasks and which versions */
+            /* constitute the n-version task */
+            TIRAN_VotingDescribe(dv, 2, 1, 0);
+            TIRAN_VotingDescribe(dv, 4, 2, 0);
+            TIRAN_VotingDescribe(dv, 8, 3, 1);
+
+            TIRAN_VotingRun(dv);
+
+            /* output should be sent to task 5 */
+            TIRAN_VotingOutput(dv, 5);
+            TIRAN_VotingOption(dv, TIRAN_VOTING_IS_MAJORITY);
+    ...
+
+(to be continued)
