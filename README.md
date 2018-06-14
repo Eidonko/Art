@@ -283,15 +283,142 @@ This header file needs to be compiled with the application. Run-time error recov
 out by the RINT module, which basically is an r-code interpreter. This module and its recovery
 algorithm will be part of another repository. 
 
-I now describe how to translate an ARIEL script into the r-code. The following one the simple script
-will be used as an example.
+I now describe how to translate an ARIEL script into the r-code. The simple script test3.ariel
+will be used as an example:
+
+    INCLUDE "my_definitions.h"
+    IF [ PHASE (T{VOTER1}) == {HAS FAILED} ]
+    THEN
+        STOP T{VOTER1}
+        SEND {WAKEUP} T{SPARE}
+        SEND {VOTER1} T{SPARE}
+        SEND {SPARE} T{VOTER2}
+        SEND {SPARE} T{VOTER3}
+    FI
+
+where my_definitions.h is as follows:
+
+    #define ALARM 999
+    #define SPARE 3
+    #define VOTER1  0
+    #define VOTER2  1
+    #define VOTER3  2
+    #define NODE1  1
+    #define NODE2  2
+    #define NODE3  3
+    #define NODE4  4
+    #define HAS_FAILED 9999
 
 The following scenario is assumed: a triple modular redundancy (TMR) system consisting of
 three voting tasks, identified by integers {VOTER1}, {VOTER2}, and {VOTER3} is operating.
 A fourth task, identified as T{SPARE}, is available and waiting. It is ready to take over one
 of the voting tasks should the latter fail. The failed voter signals its state to the backbone by
-entering phase HAS_FAILED through some self-diagnostic module (e.g., assertions or controlflow
+entering phase HAS_FAILED through some self-diagnostic module (e.g., assertions or control flow
 monitoring). The spare is enabled when it receives a {WAKEUP} message and it requires
 the identity of the voter it has to take over. Finally, it is assumed that once a voter receives a
 control message with the identity of the spare, it has to initiate a reconfiguration of the TMR
-(to be continued)
+such that the failed voter is switched out of and the spare is switched in the system.
+
+The following command processes test3.ariel
+
+    $ art -s -i test3.ariel    
+    Ariel translator, v3.0e, by Eidon@tutanota.com.
+    Parsing file test3.ariel...
+    [ Including file `my_definitions.h' ...about to add association `ALARM' -> `999'
+    about to add association `SPARE' -> `3'
+    about to add association `VOTER1' -> `0'
+    about to add association `VOTER2' -> `1'
+    about to add association `VOTER3' -> `2'
+    about to add association `NODE1' -> `1'
+    about to add association `NODE2' -> `2'
+    about to add association `NODE3' -> `3'
+    about to add association `NODE4' -> `4'
+    about to add association `HAS_FAILED' -> `9999'
+    10 associations have been stored. ]
+        substituting T{VOTER1} with T0
+        substituting {HAS FAILED} with 1
+        substituting T{VOTER1} with T0
+        substituting {WAKEUP} with 18
+        substituting T{SPARE} with T3
+        substituting {VOTER1} with 0
+        substituting T{SPARE} with T3
+        substituting {SPARE} with 3
+        substituting T{VOTER2} with T1
+        substituting {SPARE} with 3
+        substituting T{VOTER3} with T2
+        if-then-else: ok
+    ...done (9 lines.)
+    Output written in file .rcode.
+    static version
+    Preloaded r-codes written in file outputs/trl.h.
+    Time-outs written in file outputs/timeouts.h.
+    Identifiers written in file outputs/identifiers.h.
+    Alpha-count parameters written in file outputs/alphacount.h.
+
+File outputs/trl.h containes the the r-codes:
+
+    /********************************************************************************
+      *                                                                              *
+      *  Header file trl.h                                                           *
+      *                                                                              *
+      *  This file contains a preloaded set of r-codes for Ariel file   test3.ariel  *
+      *  Written by art (           v3.0e) on                               (null)  *
+      *  (c) Eidon@tutanota.com (https://github.com/Eidonko)    .                    *
+      *                                                                              *
+      ********************************************************************************/
+
+    #ifndef _T_R_L__H_
+    #define _T_R_L__H_
+
+    #include "rcode.h"
+
+    #define RCODE_CARD 16 /* number of rcodes that have been produced */
+
+
+    static rcode_t rcodes[] = {
+
+    /*line#*/      /* opcode */     /* operand 1 */  /* operand 2 */
+
+    /*0*/       { R_INC_NEST,             -1,              -1 },
+    /*1*/       { R_STRPHASE,              0,              -1 },
+    /*2*/       { R_COMPARE,               1,               1 },
+    /*3*/       { R_FALSE,                10,              -1 },
+    /*4*/       { R_KILL,                 18,               0 },
+    /*5*/       { R_PUSH,                 18,              -1 },
+    /*6*/       { R_SEND,                 18,               3 },
+    /*7*/       { R_PUSH,                  0,              -1 },
+    /*8*/       { R_SEND,                 18,               3 },
+    /*9*/       { R_PUSH,                  3,              -1 },
+    /*10*/      { R_SEND,                 18,               1 },
+    /*11*/      { R_PUSH,                  3,              -1 },
+    /*12*/      { R_SEND,                 18,               2 },
+    /*13*/      { R_DEC_NEST,             -1,              -1 },
+    /*14*/      { R_OANEW,                 1,              -1 },
+    /*15*/      { R_STOP,                 -1,              -1 },
+    };
+
+    #endif /* _T_R_L__H_ */
+
+A textual representation of the r-codes is also produced in file output.rcode:
+
+    Art translated Ariel strategy file: .... test3.ariel
+    into rcode object file : ............... .rcode
+
+     line                rcode     opn1   opn2
+    -----------------------------------------------
+    00000                   IF
+    00001       STORE_PHASE...   Thread      0
+    00002           ...COMPARE       ==      1
+    00003                FALSE     10
+    00004                 KILL   Thread      0
+    00005              PUSH...     18
+    00006              ...SEND   Thread      3
+    00007              PUSH...      0
+    00008              ...SEND   Thread      3
+    00009              PUSH...      3
+    00010              ...SEND   Thread      1
+    00011              PUSH...      3
+    00012              ...SEND   Thread      2
+    00013                   FI
+    00014      ANEW_OA_OBJECTS      1
+    00015                 STOP
