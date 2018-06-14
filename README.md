@@ -159,4 +159,139 @@ If we invoke art with as input the above excerpt (see file test2.ariel), a numbe
             TIRAN_VotingOption(dv, TIRAN_VOTING_IS_MAJORITY);
     ...
 
+The above is one of the three files produced by the ARIEL translator when it parses test2.ariel.
+Said file configures an instance of the TIRAN DV tool (distributed voting tool), which I also designed and developed.
+Note also how all technicalities concerning:
+
+- the API of the tool,
+- input replication,
+- the adopted voting strategy,
+- output communication,
+
+and so forth are fully made transparent to the designer, who needs only be concerned with the
+functional service. This allows the fault-tolerance designer to modify all the above mentioned
+technicalities with no repercussions on the tasks of the application designer, and even to deploy
+different strategies depending on the particular target platform.
+
+## ARIEL as a recovery language
+Recovery strategies are collections of sections with the following syntax:
+
+    section : if elif else fi ;
+    if : IF ’[’ guard ’]’ THEN actions ;
+    elif :
+         | ELIF ’[’ guard ’]’
+           THEN actions elif ;
+    else :
+         | ELSE actions ;
+    fi : FI ;
+
+where non-terminals 'guard' and 'actions' are respectively a condition testing the status of a task or a node
+and an action affecting a task, a node, or a group of tasks.
+
+An excerpt of the context-free grammar rules for guards follows:
+
+    status :FAULTY | RUNNING | REBOOTED | STARTED | ISOLATED | RESTARTED | TRANSIENT ;
+    entity :GROUP | NODE | TASK ;
+    expr : status entity
+         |  ’(’ expr ’)’
+         | expr AND expr
+         | expr OR expr
+         | NOT expr
+         | ERRN ’(’ entity ’)’ comp NUMBER
+         | PHASE ’(’ entity ’)’ comp NUMBER ;
+    comp :EQ j NEQ j GT j GE j LT j LE ;
+
+The following conditions and values have been foreseen:
+
+- Faulty. This is true when an error notification related to a processing node, a group of tasks, or a single task, can be found in the TIRAN DB.
+- Running. True when the corresponding entity is active and no error has been detected that regards it.
+- Rebooted (only applicable to nodes). This means that a node has been rebooted at least once during the run-time of the application.
+- Started (not applicable to nodes). This checks whether a waiting task or group of task has been started.
+- Isolated. This clause is true when its argument has been isolated from the rest of the application through a deliberate action.
+- Phase (only applicable to tasks). It returns the current value of an attribute set by any task via the public function RaiseEvent. This value is forwarded to the BB to represent its current “phase” or state (e.g., an identifier referring to its current algorithmic step, or the outcome of a test or of an assertion). For instance, a voting task could inform the BB that it has completed a given algorithmic step by setting a given integer value after each step (this approach is transparently adopted in the EFTOS voting tool and is described in more detail in [DFDL98c]). Recovery block tests can take advantage of this facility to switch back and try an alternate task when a primary one sets a “failure” phase or when a guarding watchdog expires because a watched task sent it no signs of life. This condition returns an integer symbol that can be compared via C-like arithmetic operators.
+- Restarted (not applicable to nodes). This returns the number of times a given task or group has been restarted. It implies started.
+- Transient is true when an entity has been detected as faulty and the current assessment of the alpha-count fault identification mechanism is “transient”. It implies faulty.
+
+Furthermore, it is possible to query the number of errors that have been detected and pertain
+to a given entity.
+
+Complex guards can be built via the standard logic connectives and parentheses.
+As an example, the following guard:
+
+    FAULTY TASK{MASTER} AND ERRN(TASK{MASTER}) > 10 AND RESTARTED TASK{MASTER}.
+
+checks whether the three conditions:
+
+- the task, the unique-id of which is the value of the symbolic constant MASTER, has been detected as faulty;
+- more than 10 errors have been associated to that task;
+- that task has been restarted,
+
+are all true.
+
+“Actions” can be attached to the THEN or ELSE parts of a section. In the
+current implementation of the language, these actions allow to start, isolate, restart, terminate a
+task or a group of tasks, to isolate or reboot a node, to invoke a local function. Moreover, it is
+possible to multicast messages to groups of tasks and to purge events from the DB.
+
+An excerpt of the context-free grammar for ARIEL’s actions follows:
+
+    actions :
+            | actions action ;
+    action :
+           | section
+           | recovery action ;
+
+    recovery action
+           : STOP entity
+           | ISOLATE entity
+           | START entity
+           | REBOOT entity
+           | RESTART entity
+           | ENABLE entity
+           | SEND NUMBER TASK
+           | SEND NUMBER GROUP
+           | WARN entity ( condition )
+           | REMOVE PHASE entity FROM ERRORL
+           | CALL NUMBER
+           | CALL NUMBER ’(’ list ’)’
+    condition : ERR NUMBER entity ;
+
+A special case of action is a section, i.e., another guarded action.
+This allows to specify hierarchies (trees) of sections such that, during the run-time evaluation of
+the recovery strategies, a branch is only visited when its parent clause has been evaluated as true.
+In the current, prototypic implementation, the following actions have been foreseen
+
+- Stop terminates a task or a group of tasks, or initiates the shutdown procedure of a node8.
+- Isolate prevents an entity to communicate with the rest of the system9.
+- Reboot reboots a node (via the TIRAN Reboot Node BT).
+- Start spawns (or, in static environments, awakes) a task or a group.
+- Restart is reverting a task or group of tasks to their initial state or, if no other means are available,
+- stopping that entity and spawning a clone of it.
+- Enable awakes a task or group, or boots a node.
+- Send multicasts (or sends) signals to groups of tasks (or single tasks).
+- Warn informs a task or group of tasks that an error regarding an entity has been detected. Action “WARN x” is equivalent to action “SEND {WARN} x”
+- Remove purges records from the section of the DB collecting the errors or the phases of a given entity.
+
+Custom actions and conditions may be easily added to the grammar of ARIEL.
+
+## ARIEL in action
+Once fed with a recovery script, the art translator produces a binary pseudo-code, called the
+r-code. In the current version, this r-code is written in a binary file and in a C header file as a
+statically defined C array. The r-code is made of a set of “triplets” of integers,
+given by an opcode and two operands. These are called “r-codes”.
+This header file needs to be compiled with the application. Run-time error recovery is carried
+out by the RINT module, which basically is an r-code interpreter. This module and its recovery
+algorithm will be part of another repository. 
+
+I now describe how to translate an ARIEL script into the r-code. The following one the simple script
+will be used as an example.
+
+The following scenario is assumed: a triple modular redundancy (TMR) system consisting of
+three voting tasks, identified by integers {VOTER1}, {VOTER2}, and {VOTER3} is operating.
+A fourth task, identified as T{SPARE}, is available and waiting. It is ready to take over one
+of the voting tasks should the latter fail. The failed voter signals its state to the backbone by
+entering phase HAS_FAILED through some self-diagnostic module (e.g., assertions or controlflow
+monitoring). The spare is enabled when it receives a {WAKEUP} message and it requires
+the identity of the voter it has to take over. Finally, it is assumed that once a voter receives a
+control message with the identity of the spare, it has to initiate a reconfiguration of the TMR
 (to be continued)
