@@ -121,13 +121,12 @@ If we invoke art with as input the above excerpt (see file test2.ariel), a numbe
     $ art -s -i test2.ariel
     Ariel translator, v3.0e, by Eidon@tutanota.com.
     ...
-    
     $ ls -lt | head -5
     total 1255
-    -rwxrwx---+ 1 DEFLORIV Domain Users    221 Jun 14 22:17 output.rcode
-    -rw-rw-r--+ 1 DEFLORIV Domain Users   1196 Jun 14 22:17 TIRAN_task_8.c
-    -rw-rw-r--+ 1 DEFLORIV Domain Users   1196 Jun 14 22:17 TIRAN_task_4.c
-    -rw-rw-r--+ 1 DEFLORIV Domain Users   1196 Jun 14 22:17 TIRAN_task_2.c
+    -rwxrwx---+ 1 EIDONKOE Domain Users    221 Jun 14 22:17 output.rcode
+    -rw-rw-r--+ 1 EIDONKOE Domain Users   1196 Jun 14 22:17 TIRAN_task_8.c
+    -rw-rw-r--+ 1 EIDONKOE Domain Users   1196 Jun 14 22:17 TIRAN_task_4.c
+    -rw-rw-r--+ 1 EIDONKOE Domain Users   1196 Jun 14 22:17 TIRAN_task_2.c
 
     $ less TIRAN_task_8.c
     #include "../TIRAN_API.h"
