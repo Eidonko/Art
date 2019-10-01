@@ -1738,7 +1738,7 @@ char *today()
 { 
   FILE *popen(const char *, const char *);
   /* FILE *f = popen("./date", "r"); */
-  FILE *f = fopen("date", "r");
+  FILE *f = popen("/usr/bin/date", "r");
   static char td[80];
   if (f==NULL)
 	return NULL;

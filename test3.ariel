@@ -1,4 +1,28 @@
     INCLUDE "my_definitions.h"
+
+    NPROCS = 4
+    Define 0 = MANAGER
+    Define 1 = BACKUP
+    Define 2 = BACKUP
+    Define 3 = BACKUP
+
+    MIA_SEND_TIMEOUT  =  800000    # Manager Is Alive -- manager  side
+    TAIA_RECV_TIMEOUT = 1500000    # This Agent Is Alive timeout--manager side
+
+    TASK 1 = "Backbone0" IS NODE 1, TASKID {BACKBONE_TASKID}
+    TASK 2 = "Backbone1" IS NODE 2, TASKID {BACKBONE_TASKID}
+    TASK 3 = "Backbone2" IS NODE 3, TASKID {BACKBONE_TASKID}
+    TASK 4 = "Backbone3" IS NODE 4, TASKID {BACKBONE_TASKID}
+    LOGICAL 1 = "LBack0" IS TASK 1 END
+    LOGICAL 2 = "LBack1"   IS TASK 2  END
+    LOGICAL {ALL} ="all" IS TASK 1,2,3,4 END
+
+    NUMTASKS 0 = 5
+    NUMTASKS 1 = 5
+    NUMTASKS 2 = 5
+    NUMTASKS 3 = 5
+
+
     IF [ PHASE (T{VOTER1}) == {HAS FAILED} ]
     THEN
         STOP T{VOTER1}

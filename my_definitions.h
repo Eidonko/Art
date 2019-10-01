@@ -7,4 +7,7 @@
 #define NODE2  2
 #define NODE3  3
 #define NODE4  4
+#define BACKBONE_TASKID  0
 #define HAS_FAILED 9999
+#define ALL	1
+#define WAKEUP	1
