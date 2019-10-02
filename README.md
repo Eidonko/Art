@@ -1,15 +1,8 @@
 # Art
 Translator of the Ariel recovery language
 
-ARIEL is a declarative language with a syntax somewhat similar to that of the UNIX shells. One
-instruction per line is allowed. Comments are like in the C shell (“#” starts a comment which
-ends at next new line or at end-of-file). Names are not case-sensitive. ARIEL deals with five basic
-types: “nodes”, “tasks”, “logicals”, integers, and real numbers. A node is a uniquely identifiable
-processing node of the system, e.g., a processor of a MIMD supercomputer. A task is a uniquely
-identifiable process or thread in the system. A logical is a uniquely identifiable collection of
-tasks, possibly running on different nodes. Nodes, tasks, and logicals are generically called
-entities. Entities are uniquely identified via non-negative integers; for instance, NODE3 or N3
-refer to processing node currently configured as number 3.
+ARIEL is a declarative language with a syntax somewhat similar to that of the UNIX shells. Comments are like in the C shell (“#” starts a comment which ends at next new line or at end-of-file). Names are not case-sensitive. ARIEL deals with five basic types: “nodes”, “tasks”, “logicals”, integers, and real numbers. A node is a uniquely identifiable processing node of the system, e.g., a processor of a MIMD supercomputer. A task is a uniquely identifiable process or thread in the system. A logical is a uniquely identifiable collection of
+tasks, possibly running on different nodes. Nodes, tasks, and logicals are generically called entities. Entities are uniquely identified via non-negative integers; for instance, NODE3 or N3 refer to processing node currently configured as number 3.
 
 Integer symbolic constants can be “imported” from C language header files through the statement
 INCLUDE. For instance, if the C language header file "vf.h" contains a define statement
