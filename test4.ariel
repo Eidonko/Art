@@ -1,0 +1,22 @@
+    INCLUDE "my_definitions.h"
+
+    NPROCS = 4
+    Define 0 = MANAGER
+    Define 1 = BACKUP
+    Define 2 = BACKUP
+    Define 3 = BACKUP
+    NUMTASKS 0 = 25
+    NUMTASKS 1 = 15
+    NUMTASKS 2 = 15
+    NUMTASKS 3 = 15
+
+    MIA_SEND_TIMEOUT  = {ManagerIsAliveTimeout}    # Manager Is Alive -- manager  side
+    TAIA_RECV_TIMEOUT = {ThisAgentIsAliveTimeout}  # This Agent Is Alive timeout--manager side
+
+
+    WATCHDOG TASK {MyWatchdogTask} WATCHES TASK {MyProtectedTask}
+	HEARTBEATS EVERY {MyWatchdogTimeout} MS
+        ALPHA-COUNT IS   threshold = 3.0,  factor = 0.3   END ALPHA-COUNT
+        ON ERROR WARN TASK {TaskToBeNotified}
+    END WATCHDOG
+
